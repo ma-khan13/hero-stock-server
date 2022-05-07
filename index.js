@@ -20,7 +20,12 @@ async function serverRun() {
     try {
         await client.connect();
         const stockCollection = client.db("heroStock").collection("stock_item")
-
+        app.get('/stock-item', async (req, res) => {
+            const query = {};
+            const cursor = stockCollection.find(query);
+            const stockItems = await cursor.toArray();
+            res.send(stockItems);
+        })
         app.post('/add-stock-item', async (req, res) => {
             const newStockItem = req.body;
             const result = await stockCollection.insertOne(newStockItem);
