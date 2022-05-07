@@ -33,6 +33,14 @@ async function serverRun() {
             res.send(stockItem);
             
         })
+        app.get('/my-stock/:email', async (req, res) => {
+            const email = req.params.email;
+            const query = { email };
+            const cursor = stockCollection.find(query);
+            const myStockItems = await cursor.toArray();
+            res.send(myStockItems);
+            
+        })
         app.post('/add-stock-item', async (req, res) => {
             const newStockItem = req.body;
             const result = await stockCollection.insertOne(newStockItem);
