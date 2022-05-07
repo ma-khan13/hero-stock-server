@@ -1,4 +1,4 @@
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
@@ -20,11 +20,18 @@ async function serverRun() {
     try {
         await client.connect();
         const stockCollection = client.db("heroStock").collection("stock_item")
-        app.get('/stock-item', async (req, res) => {
+        app.get('/stock-items', async (req, res) => {
             const query = {};
             const cursor = stockCollection.find(query);
             const stockItems = await cursor.toArray();
             res.send(stockItems);
+        })
+        app.get('/stock-item/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const stockItem = await stockCollection.findOne(query);
+            res.send(stockItem);
+            
         })
         app.post('/add-stock-item', async (req, res) => {
             const newStockItem = req.body;
@@ -38,9 +45,6 @@ async function serverRun() {
 }
 serverRun().catch(console.dir);
 
-// app.get("/", (req, res) => {
-//   res.send("Server configuration ok");
-// });
 
 app.listen(port, () => {
   console.log("Server listening on port", port);
