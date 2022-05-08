@@ -1,4 +1,4 @@
-const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId, ObjectID } = require("mongodb");
 const express = require("express");
 const cors = require("cors");
 const { options } = require("nodemon/lib/config");
@@ -40,7 +40,13 @@ async function serverRun() {
           );
           res.send({ massage: stockItem });
         });
-
+      app.delete('/stock-item-delete/:id', async (req,res) => {
+        const id = req.params.id;
+        const query = { _id: ObjectId(id) }
+        const result = await stockCollection.deleteOne(query);
+        res.send(result);
+      })
+      
         app.get('/stock-item/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
