@@ -1,4 +1,5 @@
 const { MongoClient, ServerApiVersion, ObjectId, ObjectID } = require("mongodb");
+const jwt = require('jsonwebtoken');
 const express = require("express");
 const cors = require("cors");
 const { options } = require("nodemon/lib/config");
@@ -20,7 +21,15 @@ const client = new MongoClient(uri, {
 async function serverRun() {
     try {
         await client.connect();
-        const stockCollection = client.db("heroStock").collection("stock_item")
+      const stockCollection = client.db("heroStock").collection("stock_item")
+      
+
+      //Auth
+      app.post('/login', async (req, res) => {
+        const user = req.body;
+        const accessToken = jwt.sign(user, process.env.JWT_ACCESS_TOKEN_SECRET, { expiresIn: '1d' });
+        res.send({accessToken})
+      })
         app.get('/stock-items', async (req, res) => {
             const query = {};
             const cursor = stockCollection.find(query);
@@ -54,7 +63,8 @@ async function serverRun() {
             res.send(stockItem);
             
         })
-        app.get('/my-stock/:email', async (req, res) => {
+      app.get('/my-stock/:email', async (req, res) => {
+        const auth = req.headers.authorization
             const email = req.params.email;
             const query = { email };
             const cursor = stockCollection.find(query);
