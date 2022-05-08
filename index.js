@@ -1,6 +1,7 @@
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const express = require("express");
 const cors = require("cors");
+const { options } = require("nodemon/lib/config");
 require("dotenv").config();
 
 const app = express();
@@ -26,6 +27,20 @@ async function serverRun() {
             const stockItems = await cursor.toArray();
             res.send(stockItems);
         })
+        app.put("/quantity-update/:id", async (req, res) => {
+          const id = req.params.id;
+            const updatedQuantity = req.body;
+            const filterQuery = { _id: ObjectId(id) };
+          const options = { upsert: true };
+          const updateQuantity = { $set: { quantity: updatedQuantity.quantity } };
+          const stockItem = await stockCollection.updateOne(
+            filterQuery,
+            updateQuantity,
+            options
+          );
+          res.send({ massage: stockItem });
+        });
+
         app.get('/stock-item/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
