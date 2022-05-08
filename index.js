@@ -74,6 +74,9 @@ async function serverRun() {
 }
 serverRun().catch(console.dir);
 
+app.get('/', (req, res) => {
+  res.send('Running Server');
+})
 
 app.listen(port, () => {
   console.log("Server listening on port", port);
